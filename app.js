@@ -1,23 +1,18 @@
-const WS_URL = "wss://ws.binaryws.com/websockets/v3";
+const WS_URL = "wss://api.derivws.com/trading/v1/options/ws/public";
+489520
 let ws = null;
 let reconnectTimer = null;
 let reconnectAttempts = 0;
 let selectedSymbol = "1HZ100V";
 let ticks = [];
-let connectedAt = 0;
-let lastTickEpoch = 0;
 const MAX_TICKS = 250;
 
 const $ = id => document.getElementById(id);
-const connection = $("connection");
-const connectionText = $("connectionText");
-const market = $("market");
-const contractType = $("contractType");
-const targetDigit = $("targetDigit");
 
 function setStatus(kind, text) {
-  connection.className = "status " + kind;
-  connectionText.textContent = text;
+  const el = $("connection");
+  el.className = "status " + kind;
+  $("connectionText").textContent = text;
 }
 
 function log(msg) {
@@ -28,47 +23,70 @@ function log(msg) {
   while (el.children.length > 20) el.lastChild.remove();
 }
 
+function send(obj) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(obj));
+  }
+}
+
 function digitOfQuote(q) {
   const s = String(q);
-  const clean = s.includes(".") ? s.replace(/0+$/,"") : s;
-  return Number(clean.slice(-1));
+  const parts = s.split(".");
+  if (parts.length === 1) return Number(s.slice(-1));
+  const decimals = parts[1];
+  return Number(decimals.length ? decimals.slice(-1) : parts[0].slice(-1));
 }
 
 function formatPrice(q) {
-  return Number(q).toLocaleString(undefined,{maximumFractionDigits:8});
+  return Number(q).toLocaleString(undefined, {maximumFractionDigits: 8});
 }
 
-function send(obj) {
-  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj));
+function resetAnalysis(message = "Collecting live tick data...") {
+  ticks = [];
+  $("tickCount").textContent = "0";
+  $("lastDigit").textContent = "—";
+  $("price").textContent = "—";
+  $("latency").textContent = "—";
+  $("signal").textContent = "WAIT";
+  $("confidence").textContent = "0.0%";
+  $("reason").textContent = message;
+  renderFeed();
+  renderDistribution();
 }
 
 function connect() {
   clearTimeout(reconnectTimer);
-  setStatus("connecting","CONNECTING TO DERIV...");
-  try { ws = new WebSocket(WS_URL); }
-  catch(e) { scheduleReconnect(); return; }
+  setStatus("connecting", "CONNECTING TO DERIV...");
+
+  try {
+    ws = new WebSocket(WS_URL);
+  } catch (e) {
+    log("Browser could not create WebSocket: " + e.message);
+    scheduleReconnect();
+    return;
+  }
 
   ws.onopen = () => {
     reconnectAttempts = 0;
-    connectedAt = performance.now();
-    setStatus("connected","LIVE MARKET CONNECTED");
-    log("Connected to Deriv market-data WebSocket.");
-    send({active_symbols:"brief", product_type:"basic", req_id:1});
+    setStatus("connected", "LIVE MARKET CONNECTED");
+    log("Connected to Deriv public market-data WebSocket.");
+    resetAnalysis("Connected. Waiting for live ticks...");
     subscribe(selectedSymbol);
   };
 
-  ws.onmessage = e => {
+  ws.onmessage = event => {
     let data;
-    try { data = JSON.parse(e.data); } catch { return; }
-
-    if (data.error) {
-      log("API error: " + (data.error.message || "Unknown error"));
-      setStatus("disconnected","API ERROR — RECONNECTING...");
+    try {
+      data = JSON.parse(event.data);
+    } catch {
+      log("Received a non-JSON response.");
       return;
     }
 
-    if (data.msg_type === "active_symbols") {
-      populateSymbols(data.active_symbols || []);
+    if (data.error) {
+      const msg = data.error.message || data.error.code || "Unknown Deriv API error";
+      log("Deriv API error: " + msg);
+      setStatus("disconnected", "DERIV API ERROR — CHECKING CONNECTION...");
       return;
     }
 
@@ -78,14 +96,21 @@ function connect() {
     }
 
     if (data.msg_type === "ping") return;
+
+    // New API may return other system messages; keep them visible for diagnosis.
+    if (data.msg_type && data.msg_type !== "tick") {
+      log("Deriv response: " + data.msg_type);
+    }
   };
 
   ws.onerror = () => {
-    setStatus("disconnected","CONNECTION ERROR — RECONNECTING...");
+    log("WebSocket network error.");
+    setStatus("disconnected", "CONNECTION ERROR — RECONNECTING...");
   };
 
-  ws.onclose = () => {
-    setStatus("disconnected","DISCONNECTED — RECONNECTING...");
+  ws.onclose = event => {
+    log("WebSocket closed (" + event.code + ").");
+    setStatus("disconnected", "DISCONNECTED — RECONNECTING...");
     scheduleReconnect();
   };
 }
@@ -93,41 +118,19 @@ function connect() {
 function scheduleReconnect() {
   clearTimeout(reconnectTimer);
   reconnectAttempts++;
-  const delay = Math.min(1000 * Math.pow(1.7, Math.min(reconnectAttempts,7)), 15000);
+  const delay = Math.min(1000 * Math.pow(1.7, Math.min(reconnectAttempts, 7)), 15000);
   reconnectTimer = setTimeout(connect, delay);
 }
 
 function subscribe(symbol) {
   selectedSymbol = symbol;
-  ticks = [];
-  $("tickCount").textContent = "0";
-  $("lastDigit").textContent = "—";
-  $("price").textContent = "—";
-  $("signal").textContent = "WAIT";
-  $("confidence").textContent = "0.0%";
-  $("reason").textContent = "Collecting live tick data...";
-  send({ticks:symbol, subscribe:1, req_id:2});
-  log("Subscribed to " + symbol + ".");
-}
-
-function populateSymbols(list) {
-  const wanted = [
-    ["1HZ100V","Volatility 100 Index"],
-    ["1HZ75V","Volatility 75 (1s) Index"],
-    ["1HZ50V","Volatility 50 (1s) Index"],
-    ["1HZ25V","Volatility 25 (1s) Index"],
-    ["1HZ10V","Volatility 10 (1s) Index"]
-  ];
-  const available = new Map(list.map(x => [x.symbol, x.display_name]));
-  market.innerHTML = "";
-  wanted.forEach(([sym,name]) => {
-    if (available.has(sym) || sym === "1HZ100V") {
-      const o = document.createElement("option");
-      o.value = sym; o.textContent = available.get(sym) || name;
-      market.appendChild(o);
-    }
+  resetAnalysis("Subscribed. Waiting for live ticks...");
+  send({
+    ticks: symbol,
+    subscribe: 1,
+    req_id: 2
   });
-  market.value = selectedSymbol;
+  log("Requested live ticks for " + symbol + ".");
 }
 
 function handleTick(tick) {
@@ -136,9 +139,8 @@ function handleTick(tick) {
 
   const digit = digitOfQuote(tick.quote);
   const epoch = Number(tick.epoch) * 1000;
-  lastTickEpoch = epoch;
 
-  ticks.push({quote,digit,epoch});
+  ticks.push({quote, digit, epoch});
   if (ticks.length > MAX_TICKS) ticks.shift();
 
   $("price").textContent = formatPrice(quote);
@@ -159,7 +161,9 @@ function renderFeed() {
   ticks.slice(-12).reverse().forEach(t => {
     const d = document.createElement("div");
     d.className = "row";
-    d.innerHTML = `<span>${new Date(t.epoch).toLocaleTimeString()}</span><span>${formatPrice(t.quote)} • digit ${t.digit}</span>`;
+    d.innerHTML =
+      `<span>${new Date(t.epoch).toLocaleTimeString()}</span>` +
+      `<span>${formatPrice(t.quote)} • digit ${t.digit}</span>`;
     el.appendChild(d);
   });
 }
@@ -170,11 +174,14 @@ function renderDistribution() {
   const total = ticks.length || 1;
   const el = $("digits");
   el.innerHTML = "";
-  counts.forEach((n,d) => {
+
+  counts.forEach((n, d) => {
     const pct = n / total * 100;
     const box = document.createElement("div");
     box.className = "digit";
-    box.innerHTML = `<b>${d}</b><div class="bar"><i style="width:${pct}%"></i></div><span>${pct.toFixed(1)}%</span>`;
+    box.innerHTML =
+      `<b>${d}</b><div class="bar"><i style="width:${pct}%"></i></div>` +
+      `<span>${pct.toFixed(1)}%</span>`;
     el.appendChild(box);
   });
 }
@@ -187,19 +194,18 @@ function analyze() {
     return;
   }
 
-  const target = Number(targetDigit.value);
+  const target = Number($("targetDigit").value);
   const matches = ticks.filter(t => t.digit === target).length;
   const p = matches / ticks.length;
-  const base = 10;
+  const type = $("contractType").value;
 
-  // Descriptive confidence: distance from the 10% baseline,
-  // capped to avoid presenting a tiny sample as certainty.
+  // Descriptive score only. It is not a prediction or guaranteed probability.
   const edge = Math.abs(p - 0.10);
   const confidence = Math.min(99, 50 + edge * 500);
-  const type = contractType.value;
 
   let signal = "WAIT";
-  let reason = `Digit ${target}: ${(p*100).toFixed(1)}% in the last ${ticks.length} ticks.`;
+  let reason =
+    `Digit ${target}: ${(p * 100).toFixed(1)}% in the last ${ticks.length} ticks.`;
 
   if (ticks.length >= 50) {
     if (type === "matches" && p >= 0.13) {
@@ -221,29 +227,24 @@ function analyze() {
 }
 
 $("market").addEventListener("change", () => {
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    subscribe(market.value);
-  } else {
-    selectedSymbol = market.value;
-  }
+  selectedSymbol = $("market").value;
+  if (ws && ws.readyState === WebSocket.OPEN) subscribe(selectedSymbol);
 });
 
 $("runBtn").addEventListener("click", () => {
-  ticks = [];
-  $("tickCount").textContent = "0";
-  $("signal").textContent = "WAIT";
-  $("confidence").textContent = "0.0%";
-  $("reason").textContent = "Analysis reset — collecting fresh live ticks...";
-  if (ws && ws.readyState === WebSocket.OPEN) subscribe(market.value);
-  else connect();
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    subscribe($("market").value);
+  } else {
+    connect();
+  }
 });
 
-contractType.addEventListener("change", analyze);
-targetDigit.addEventListener("change", analyze);
+$("contractType").addEventListener("change", analyze);
+$("targetDigit").addEventListener("change", analyze);
 
 setInterval(() => {
   if (ws && ws.readyState === WebSocket.OPEN) {
-    send({ping:1, req_id:99});
+    send({ping: 1, req_id: 99});
   }
 }, 20000);
 
