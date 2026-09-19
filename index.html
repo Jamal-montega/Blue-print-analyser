@@ -1,259 +1,728 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blueprint Analyzer V2</title>
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Blueprint Analyzer</title>
 
 <style>
+
 *{
     box-sizing:border-box;
 }
 
+html{
+    scroll-behavior:smooth;
+}
+
 body{
+
     margin:0;
-    background:#05070b;
-    color:#e8eef7;
-    font-family:Arial,Helvetica,sans-serif;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #111827 0%,
+            #05070b 45%,
+            #030408 100%
+        );
+
+    color:#edf3ff;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    min-height:100vh;
+
 }
 
 .container{
+
     width:100%;
-    max-width:600px;
+
+    max-width:650px;
+
     margin:auto;
+
     padding:15px;
+
 }
 
 .header{
+
     text-align:center;
-    padding:18px 10px;
+
+    padding:20px 5px 15px;
+
 }
 
 .header h1{
+
     margin:0;
-    font-size:27px;
+
+    font-size:29px;
+
+    letter-spacing:.3px;
+
 }
 
 .header p{
-    color:#8e9aaa;
-    margin:7px 0 0;
+
+    margin:8px 0 0;
+
+    color:#8d99aa;
+
+    font-size:14px;
+
 }
 
-.status{
-    margin:15px 0;
-    padding:10px;
-    border-radius:10px;
+
+/* CONNECTION */
+
+.connection{
+
+    width:100%;
+
+    padding:13px;
+
+    border-radius:12px;
+
     text-align:center;
-    background:#10151d;
-    border:1px solid #26303d;
+
     font-weight:bold;
+
+    margin-bottom:15px;
+
+    border:1px solid #283242;
+
+    background:#0d131c;
+
 }
 
-.live{
-    color:#42ff91;
+.connection.connecting{
+
+    color:#ffc857;
+
 }
 
-.disconnected{
-    color:#ff5555;
+.connection.live{
+
+    color:#39ff88;
+
+    border-color:#174f35;
+
 }
+
+.connection.error{
+
+    color:#ff5d67;
+
+    border-color:#55232a;
+
+}
+
+
+/* CARDS */
 
 .card{
-    background:#0d1118;
-    border:1px solid #202936;
-    border-radius:14px;
-    padding:15px;
-    margin-bottom:14px;
+
+    background:
+
+        linear-gradient(
+            145deg,
+            #0e141d,
+            #090d13
+        );
+
+    border:1px solid #202a38;
+
+    border-radius:16px;
+
+    padding:16px;
+
+    margin-bottom:15px;
+
+    box-shadow:
+        0 8px 30px rgba(0,0,0,.18);
+
 }
+
+.card h2{
+
+    margin:0 0 14px;
+
+    font-size:18px;
+
+}
+
+.card h3{
+
+    margin:0 0 13px;
+
+    font-size:16px;
+
+}
+
+
+/* FORM */
 
 label{
+
     display:block;
-    margin-bottom:7px;
-    color:#aab5c5;
-    font-size:13px;
+
+    color:#99a5b7;
+
+    font-size:12px;
+
+    margin:13px 0 7px;
+
+    letter-spacing:.5px;
+
 }
 
-select,
-button{
+select{
+
     width:100%;
-    padding:13px;
-    border-radius:9px;
-    border:1px solid #303b4a;
-    background:#121923;
-    color:#fff;
+
+    padding:14px;
+
+    border-radius:11px;
+
+    border:1px solid #2a3544;
+
+    background:#121a25;
+
+    color:#f2f5fa;
+
     font-size:15px;
+
+    outline:none;
+
+}
+
+select:focus{
+
+    border-color:#4d7db8;
+
 }
 
 button{
-    margin-top:12px;
-    background:#1b2635;
-    cursor:pointer;
+
+    width:100%;
+
+    margin-top:16px;
+
+    padding:15px;
+
+    border:0;
+
+    border-radius:11px;
+
+    background:#1b2a3b;
+
+    color:white;
+
     font-weight:bold;
+
+    font-size:15px;
+
 }
 
 button:active{
+
     transform:scale(.98);
+
 }
 
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-}
 
-.stat{
-    background:#111720;
-    padding:12px;
-    border-radius:10px;
-}
-
-.stat-title{
-    font-size:12px;
-    color:#8995a6;
-}
-
-.stat-value{
-    font-size:20px;
-    font-weight:bold;
-    margin-top:5px;
-}
+/* SIGNAL */
 
 .signal{
+
     text-align:center;
-    padding:18px;
+
+    padding:24px 15px;
+
+}
+
+.signal-title{
+
+    color:#8995a6;
+
+    font-size:12px;
+
+    letter-spacing:.8px;
+
 }
 
 .signal-name{
-    font-size:25px;
+
+    font-size:27px;
+
     font-weight:bold;
+
+    margin-top:8px;
+
 }
 
 .signal-score{
-    font-size:38px;
+
+    font-size:43px;
+
     font-weight:bold;
-    margin:8px 0;
+
+    margin:5px 0;
+
 }
 
-.small{
+.signal-sub{
+
+    color:#778394;
+
     font-size:12px;
-    color:#7e8998;
+
 }
 
 .warning{
-    color:#ffbf5b;
+
+    margin-top:13px;
+
+    color:#d3a85e;
+
     font-size:11px;
-    margin-top:10px;
+
     line-height:1.5;
+
 }
 
-.bar-row{
-    margin:8px 0;
+
+/* GRID */
+
+.grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:10px;
+
 }
 
-.bar-label{
+.stat{
+
+    background:#111822;
+
+    border:1px solid #1e2835;
+
+    border-radius:11px;
+
+    padding:12px;
+
+    min-height:72px;
+
+}
+
+.stat-label{
+
+    color:#7e8b9d;
+
+    font-size:11px;
+
+}
+
+.stat-value{
+
+    margin-top:7px;
+
+    font-size:17px;
+
+    font-weight:bold;
+
+    word-break:break-word;
+
+}
+
+
+/* DIGITS */
+
+.digit-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(5,1fr);
+
+    gap:8px;
+
+}
+
+.digit-box{
+
+    background:#111822;
+
+    border:1px solid #202b39;
+
+    border-radius:10px;
+
+    padding:9px 4px;
+
+    text-align:center;
+
+}
+
+.digit-number{
+
+    font-size:17px;
+
+    font-weight:bold;
+
+}
+
+.digit-percent{
+
+    margin-top:3px;
+
+    font-size:10px;
+
+    color:#8390a2;
+
+}
+
+
+/* BARS */
+
+.analysis-row{
+
+    margin-bottom:11px;
+
+}
+
+.analysis-head{
+
     display:flex;
+
     justify-content:space-between;
+
+    margin-bottom:5px;
+
     font-size:12px;
-    margin-bottom:4px;
+
+}
+
+.analysis-head span:last-child{
+
+    color:#9aa7b8;
+
 }
 
 .bar{
+
     width:100%;
+
     height:8px;
-    background:#1a212c;
+
     border-radius:20px;
+
+    background:#18202b;
+
     overflow:hidden;
+
 }
 
 .bar-fill{
+
     height:100%;
-    background:#4a9eff;
+
     width:0%;
-    transition:.25s;
+
+    background:#4b91dc;
+
+    border-radius:20px;
+
+    transition:
+        width .3s ease;
+
 }
 
-.tick-list{
-    max-height:250px;
+
+/* TICKS */
+
+.tick-container{
+
+    max-height:310px;
+
     overflow-y:auto;
+
+    border-radius:10px;
+
 }
 
-.tick{
-    display:flex;
-    justify-content:space-between;
-    padding:7px 3px;
-    border-bottom:1px solid #1a2029;
-    font-size:12px;
+.tick-header,
+.tick-row{
+
+    display:grid;
+
+    grid-template-columns:
+        1.1fr 1.5fr .5fr;
+
+    gap:7px;
+
+    align-items:center;
+
 }
 
-.digit{
-    font-size:17px;
+.tick-header{
+
+    position:sticky;
+
+    top:0;
+
+    z-index:2;
+
+    padding:8px;
+
+    background:#121923;
+
+    color:#758294;
+
+    font-size:10px;
+
+}
+
+.tick-row{
+
+    padding:8px;
+
+    border-bottom:1px solid #18202a;
+
+    font-size:11px;
+
+}
+
+.tick-price{
+
+    text-align:right;
+
+}
+
+.tick-digit{
+
+    text-align:center;
+
     font-weight:bold;
+
+    font-size:16px;
+
 }
+
+
+/* INFO */
+
+.info{
+
+    color:#7e8998;
+
+    font-size:11px;
+
+    line-height:1.6;
+
+}
+
+
+/* FOOTER */
 
 .footer{
+
     text-align:center;
-    color:#596575;
-    font-size:11px;
-    padding:15px;
+
+    color:#505c6d;
+
+    font-size:10px;
+
+    padding:10px 0 25px;
+
 }
+
+
+/* MOBILE */
+
+@media(max-width:380px){
+
+    .container{
+
+        padding:10px;
+
+    }
+
+    .header h1{
+
+        font-size:25px;
+
+    }
+
+    .grid{
+
+        gap:7px;
+
+    }
+
+    .digit-grid{
+
+        gap:5px;
+
+    }
+
+}
+
 </style>
+
 </head>
+
 
 <body>
 
+
 <div class="container">
 
+
+    <!-- HEADER -->
+
     <div class="header">
+
         <h1>⚡ Blueprint Analyzer</h1>
-        <p>Deriv Synthetic Market Analysis Dashboard</p>
+
+        <p>
+            Deriv Synthetic Market Analysis Dashboard
+        </p>
+
     </div>
 
-    <div id="status" class="status disconnected">
+
+    <!-- CONNECTION -->
+
+    <div
+        id="connection"
+        class="connection connecting"
+    >
+
         ● CONNECTING TO DERIV...
+
     </div>
+
+
+    <!-- CONTROL PANEL -->
 
     <div class="card">
 
-        <label>MARKET</label>
+        <h2>Market Analyzer</h2>
+
+
+        <label>
+            MARKET
+        </label>
 
         <select id="market">
-            <option value="R_10">Volatility 10 Index</option>
-            <option value="R_25">Volatility 25 Index</option>
-            <option value="R_50">Volatility 50 Index</option>
-            <option value="R_75">Volatility 75 Index</option>
-            <option value="R_100" selected>Volatility 100 Index</option>
 
-            <option value="1HZ10V">Volatility 10 (1s)</option>
-            <option value="1HZ25V">Volatility 25 (1s)</option>
-            <option value="1HZ50V">Volatility 50 (1s)</option>
-            <option value="1HZ75V">Volatility 75 (1s)</option>
-            <option value="1HZ100V">Volatility 100 (1s)</option>
+            <option value="R_10">
+                Volatility 10 Index
+            </option>
+
+            <option value="R_25">
+                Volatility 25 Index
+            </option>
+
+            <option value="R_50">
+                Volatility 50 Index
+            </option>
+
+            <option value="R_75">
+                Volatility 75 Index
+            </option>
+
+            <option value="R_100" selected>
+                Volatility 100 Index
+            </option>
+
+            <option value="1HZ10V">
+                Volatility 10 (1s)
+            </option>
+
+            <option value="1HZ25V">
+                Volatility 25 (1s)
+            </option>
+
+            <option value="1HZ50V">
+                Volatility 50 (1s)
+            </option>
+
+            <option value="1HZ75V">
+                Volatility 75 (1s)
+            </option>
+
+            <option value="1HZ100V">
+                Volatility 100 (1s)
+            </option>
+
         </select>
 
-        <br><br>
 
-        <label>CONTRACT ANALYSIS</label>
+        <label>
+            CONTRACT TYPE
+        </label>
 
         <select id="contract">
 
-            <option value="matches">Matches</option>
-            <option value="differs">Differs</option>
+            <option value="matches">
+                Matches
+            </option>
 
-            <option value="even">Even</option>
-            <option value="odd">Odd</option>
+            <option value="differs">
+                Differs
+            </option>
 
-            <option value="over">Over</option>
-            <option value="under">Under</option>
+            <option value="even">
+                Even
+            </option>
 
-            <option value="rise">Rise</option>
-            <option value="fall">Fall</option>
+            <option value="odd">
+                Odd
+            </option>
+
+            <option value="over">
+                Over
+            </option>
+
+            <option value="under">
+                Under
+            </option>
+
+            <option value="rise">
+                Rise
+            </option>
+
+            <option value="fall">
+                Fall
+            </option>
 
         </select>
 
-        <br><br>
 
-        <label>TARGET DIGIT</label>
+        <label>
+            TARGET DIGIT
+        </label>
 
-        <select id="targetDigit">
+        <select id="target">
+
             <option value="0">0</option>
             <option value="1">1</option>
             <option value="2">2</option>
@@ -264,9 +733,11 @@ button:active{
             <option value="7">7</option>
             <option value="8">8</option>
             <option value="9">9</option>
+
         </select>
 
-        <button onclick="runAnalysis()">
+
+        <button id="analyzeButton">
             RUN ANALYSIS
         </button>
 
@@ -277,92 +748,168 @@ button:active{
 
     <div class="card signal">
 
-        <div class="small">
+        <div class="signal-title">
             CURRENT SIGNAL
         </div>
 
-        <div id="signalName" class="signal-name">
+        <div
+            id="signalName"
+            class="signal-name"
+        >
             WAIT
         </div>
 
-        <div id="signalScore" class="signal-score">
+        <div
+            id="signalScore"
+            class="signal-score"
+        >
             0.0%
         </div>
 
-        <div class="small">
+        <div class="signal-sub">
             Observed statistical score
         </div>
 
         <div class="warning">
-            ⚠ This is market-data analysis, not a guaranteed prediction.
-            Test the strategy with historical data before risking money.
+
+            ⚠ This measures recent market behavior.
+            It is not a guaranteed prediction or
+            guaranteed winning probability.
+
         </div>
 
     </div>
 
 
-    <!-- MARKET INFO -->
+    <!-- MARKET INFORMATION -->
 
     <div class="card">
 
-        <h3>Market Information</h3>
+        <h3>
+            Market Information
+        </h3>
+
 
         <div class="grid">
 
-            <div class="stat">
-                <div class="stat-title">Market</div>
-                <div id="marketName" class="stat-value">
-                    -
-                </div>
-            </div>
 
             <div class="stat">
-                <div class="stat-title">Last Digit</div>
-                <div id="lastDigit" class="stat-value">
-                    -
+
+                <div class="stat-label">
+                    MARKET
                 </div>
+
+                <div
+                    id="marketName"
+                    class="stat-value"
+                >
+                    Volatility 100 Index
+                </div>
+
             </div>
 
-            <div class="stat">
-                <div class="stat-title">Current Quote</div>
-                <div id="quote" class="stat-value">
-                    -
-                </div>
-            </div>
 
             <div class="stat">
-                <div class="stat-title">Ticks Analysed</div>
-                <div id="tickCount" class="stat-value">
+
+                <div class="stat-label">
+                    LAST DIGIT
+                </div>
+
+                <div
+                    id="lastDigit"
+                    class="stat-value"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    CURRENT QUOTE
+                </div>
+
+                <div
+                    id="currentQuote"
+                    class="stat-value"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    TICKS
+                </div>
+
+                <div
+                    id="tickCount"
+                    class="stat-value"
+                >
                     0
                 </div>
+
             </div>
 
+
             <div class="stat">
-                <div class="stat-title">Momentum</div>
-                <div id="momentum" class="stat-value">
-                    Neutral
+
+                <div class="stat-label">
+                    MOMENTUM
                 </div>
-            </div>
 
-            <div class="stat">
-                <div class="stat-title">Pattern</div>
-                <div id="pattern" class="stat-value">
+                <div
+                    id="momentum"
+                    class="stat-value"
+                >
                     Waiting
                 </div>
+
             </div>
+
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    PATTERN
+                </div>
+
+                <div
+                    id="pattern"
+                    class="stat-value"
+                >
+                    Waiting
+                </div>
+
+            </div>
+
 
         </div>
 
     </div>
 
 
-    <!-- DIGIT FREQUENCY -->
+    <!-- DIGIT ANALYSIS -->
 
     <div class="card">
 
-        <h3>Digit Frequency</h3>
+        <h3>
+            Digit Statistics
+        </h3>
 
-        <div id="digitStats"></div>
+        <div
+            id="digitGrid"
+            class="digit-grid"
+        >
+
+            Waiting for live data...
+
+        </div>
 
     </div>
 
@@ -371,9 +918,17 @@ button:active{
 
     <div class="card">
 
-        <h3>Contract Analysis</h3>
+        <h3>
+            Contract Analysis
+        </h3>
 
-        <div id="contractStats"></div>
+        <div
+            id="contractAnalysis"
+        >
+
+            Waiting for live data...
+
+        </div>
 
     </div>
 
@@ -382,65 +937,185 @@ button:active{
 
     <div class="card">
 
-        <h3>Live Tick History</h3>
+        <h3>
+            Live Tick History
+        </h3>
 
-        <div id="tickList" class="tick-list">
-            Waiting for live ticks...
+        <div class="tick-container">
+
+            <div class="tick-header">
+
+                <span>TIME</span>
+
+                <span>PRICE</span>
+
+                <span>DIGIT</span>
+
+            </div>
+
+            <div id="tickList">
+
+                <div class="tick-row">
+
+                    <span>
+                        -
+                    </span>
+
+                    <span class="tick-price">
+                        Waiting...
+                    </span>
+
+                    <span>
+                        -
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SYSTEM INFO -->
+
+    <div class="card">
+
+        <h3>
+            Analyzer Status
+        </h3>
+
+        <div class="info">
+
+            Data source:
+            <b>Deriv public market data</b>
+            <br>
+
+            Data mode:
+            <b>Live ticks + historical ticks</b>
+            <br>
+
+            Analysis window:
+            <b>100 ticks</b>
+            <br>
+
+            Authentication:
+            <b>Not required</b>
+            <br>
+
+            Automatic reconnect:
+            <b>Enabled</b>
+
         </div>
 
     </div>
 
 
     <div class="footer">
-        Blueprint Analyzer V2<br>
-        Live Deriv market data
+
+        Blueprint Analyzer V3<br>
+        Live Deriv Market Analysis
+
     </div>
+
 
 </div>
 
 
+
 <script>
 
-/* =========================================
-   CONFIGURATION
-========================================= */
 
-const DERIV_WS =
+/* =====================================================
+   BLUEPRINT ANALYZER
+   ===================================================== */
+
+
+/* -----------------------------------------------------
+   DERIV CONNECTIONS
+----------------------------------------------------- */
+
+
+/*
+   Current Deriv public market-data endpoint
+*/
+
+const CURRENT_ENDPOINT =
+    "wss://api.derivws.com/trading/v1/options/ws/public";
+
+
+/*
+   Legacy endpoint is kept only as a fallback.
+   If the current endpoint cannot connect,
+   the analyzer can try the backup.
+*/
+
+const FALLBACK_ENDPOINT =
     "wss://ws.binaryws.com/websockets/v3";
+
+
+/*
+   Endpoints to try
+*/
+
+const ENDPOINTS = [
+
+    CURRENT_ENDPOINT,
+
+    FALLBACK_ENDPOINT
+
+];
+
+
+/* -----------------------------------------------------
+   SETTINGS
+----------------------------------------------------- */
 
 const MAX_TICKS = 100;
 
-let ws = null;
+const MAX_DISPLAY_TICKS = 40;
+
+const RECONNECT_DELAY = 5000;
+
+
+/* -----------------------------------------------------
+   VARIABLES
+----------------------------------------------------- */
+
+let socket = null;
+
+let endpointIndex = 0;
 
 let reconnectTimer = null;
 
 let ticks = [];
 
-let pipSize = 0.01;
+let pipSize = null;
 
 let currentSymbol =
     document.getElementById("market").value;
 
 
-/* =========================================
+/* -----------------------------------------------------
    MARKET NAMES
-========================================= */
+----------------------------------------------------- */
 
 const marketNames = {
 
-    "R_10":
+    R_10:
         "Volatility 10 Index",
 
-    "R_25":
+    R_25:
         "Volatility 25 Index",
 
-    "R_50":
+    R_50:
         "Volatility 50 Index",
 
-    "R_75":
+    R_75:
         "Volatility 75 Index",
 
-    "R_100":
+    R_100:
         "Volatility 100 Index",
 
     "1HZ10V":
@@ -457,294 +1132,564 @@ const marketNames = {
 
     "1HZ100V":
         "Volatility 100 (1s)"
+
 };
 
 
-/* =========================================
-   UI HELPERS
-========================================= */
+/* =====================================================
+   CONNECTION STATUS
+   ===================================================== */
 
-function setStatus(text, live = false){
+function setConnectionStatus(
+    message,
+    state
+){
 
-    const status =
-        document.getElementById("status");
+    const element =
+        document.getElementById(
+            "connection"
+        );
 
-    status.textContent = text;
+    element.textContent =
+        message;
 
-    status.className =
-        live
-        ? "status live"
-        : "status disconnected";
+    element.className =
+        "connection " + state;
+
 }
 
 
-function updateMarketName(){
+/* =====================================================
+   NUMBER / DIGIT FUNCTIONS
+   ===================================================== */
 
-    document.getElementById("marketName")
-        .textContent =
-        marketNames[currentSymbol] || currentSymbol;
+
+/*
+   Determine decimal places.
+
+   Deriv may provide pip_size.
+   If it doesn't, the fallback is
+   based on the displayed quote.
+*/
+
+function decimalPlaces(){
+
+    if(
+        pipSize !== null &&
+        Number(pipSize) > 0
+    ){
+
+        const p =
+            Number(pipSize);
+
+        if(p < 1){
+
+            return Math.max(
+                0,
+                Math.round(
+                    -Math.log10(p)
+                )
+            );
+
+        }
+
+    }
+
+    return 2;
+
 }
 
 
-/* =========================================
-   PIP / LAST DIGIT
-========================================= */
-
-function getDecimals(pip){
-
-    pip = Number(pip);
-
-    if(!pip || pip >= 1)
-        return 0;
-
-    return Math.max(
-        0,
-        Math.round(-Math.log10(pip))
-    );
-}
-
+/*
+   Extract last digit from quote.
+*/
 
 function getLastDigit(price){
 
     const decimals =
-        getDecimals(pipSize);
+        decimalPlaces();
 
-    const formatted =
-        Number(price).toFixed(decimals);
+    const fixed =
+        Number(price)
+            .toFixed(decimals);
 
     return Number(
-        formatted.charAt(
-            formatted.length - 1
+        fixed.charAt(
+            fixed.length - 1
         )
     );
+
 }
 
 
-/* =========================================
-   CONNECT TO DERIV
-========================================= */
+/* =====================================================
+   SOCKET
+   ===================================================== */
 
 function connect(){
 
-    clearTimeout(reconnectTimer);
+    clearTimeout(
+        reconnectTimer
+    );
+
 
     currentSymbol =
-        document.getElementById("market").value;
+        document.getElementById(
+            "market"
+        ).value;
 
-    updateMarketName();
+
+    document.getElementById(
+        "marketName"
+    ).textContent =
+        marketNames[currentSymbol]
+        || currentSymbol;
+
+
+    /*
+       Clear old data when switching markets.
+    */
 
     ticks = [];
 
-    renderAll();
+    pipSize = null;
 
-    setStatus(
+    render();
+
+
+    setConnectionStatus(
         "● CONNECTING TO DERIV...",
-        false
+        "connecting"
     );
 
-    if(ws){
+
+    /*
+       Close previous connection.
+    */
+
+    if(socket){
 
         try{
-            ws.close();
-        }catch(e){}
 
-        ws = null;
+            socket.close();
+
+        }catch(error){}
+
+        socket = null;
+
     }
 
-    ws = new WebSocket(DERIV_WS);
+
+    /*
+       Select endpoint.
+    */
+
+    const endpoint =
+        ENDPOINTS[
+            endpointIndex
+        ];
 
 
-    ws.onopen = function(){
-
-        setStatus(
-            "● LIVE — DERIV CONNECTED",
-            true
-        );
-
-        /*
-         * Request active symbols.
-         * This confirms the market exists.
-         */
-
-        ws.send(JSON.stringify({
-
-            active_symbols: "brief",
-
-            product_type: "basic",
-
-            req_id: 1
-
-        }));
+    console.log(
+        "Connecting to:",
+        endpoint
+    );
 
 
-        /*
-         * Request last 100 historical ticks.
-         */
+    try{
 
-        ws.send(JSON.stringify({
+        socket =
+            new WebSocket(
+                endpoint
+            );
 
-            ticks_history:
-                currentSymbol,
+    }catch(error){
 
-            count: MAX_TICKS,
+        handleConnectionFailure();
 
-            end: "latest",
+        return;
 
-            style: "ticks",
-
-            req_id: 2
-
-        }));
+    }
 
 
-        /*
-         * Subscribe to new ticks.
-         */
+    /* -------------------------------------------------
+       OPEN
+    ------------------------------------------------- */
 
-        ws.send(JSON.stringify({
-
-            ticks:
-                currentSymbol,
-
-            subscribe: 1,
-
-            req_id: 3
-
-        }));
-
-    };
-
-
-    ws.onmessage = function(event){
-
-        let data;
-
-        try{
-
-            data =
-                JSON.parse(event.data);
-
-        }catch(error){
-
-            return;
-        }
-
-
-        /*
-         * Active symbols
-         */
-
-        if(data.msg_type ===
-            "active_symbols"){
+    socket.onopen =
+        function(){
 
             console.log(
-                "Active symbols received:",
-                data.active_symbols
+                "WebSocket connected"
             );
 
-        }
+
+            setConnectionStatus(
+                "● LIVE — DERIV CONNECTED",
+                "live"
+            );
 
 
-        /*
-         * Historical ticks
-         */
+            /*
+               Get historical ticks.
+            */
 
-        if(data.msg_type ===
-            "history"){
+            send({
 
-            handleHistory(data);
+                ticks_history:
+                    currentSymbol,
 
-        }
+                end:
+                    "latest",
+
+                style:
+                    "ticks",
+
+                count:
+                    MAX_TICKS,
+
+                subscribe:
+                    0
+
+            });
 
 
-        /*
-         * Live tick
-         */
+            /*
+               Subscribe to live ticks.
+            */
 
-        if(data.msg_type ===
-            "tick"){
+            send({
 
-            handleTick(data);
+                ticks:
+                    currentSymbol,
 
-        }
+                subscribe:
+                    1
+
+            });
+
+        };
 
 
-        /*
-         * API error
-         */
+    /* -------------------------------------------------
+       MESSAGE
+    ------------------------------------------------- */
 
-        if(data.error){
+    socket.onmessage =
+        function(event){
+
+            let data;
+
+            try{
+
+                data =
+                    JSON.parse(
+                        event.data
+                    );
+
+            }catch(error){
+
+                console.log(
+                    "Invalid response",
+                    event.data
+                );
+
+                return;
+
+            }
+
+
+            console.log(
+                "Deriv:",
+                data
+            );
+
+
+            /*
+               API ERROR
+            */
+
+            if(data.error){
+
+                console.error(
+                    "Deriv API error:",
+                    data.error
+                );
+
+
+                setConnectionStatus(
+                    "● DERIV API ERROR",
+                    "error"
+                );
+
+
+                /*
+                   Try backup endpoint
+                   if current endpoint
+                   rejects the request.
+                */
+
+                if(
+                    endpointIndex === 0
+                ){
+
+                    switchEndpoint();
+
+                }
+
+                return;
+
+            }
+
+
+            /*
+               Historical data
+            */
+
+            if(
+                data.msg_type ===
+                "history"
+            ){
+
+                processHistory(
+                    data
+                );
+
+            }
+
+
+            /*
+               Live tick
+            */
+
+            if(
+                data.msg_type ===
+                "tick"
+            ){
+
+                processTick(
+                    data
+                );
+
+            }
+
+        };
+
+
+    /* -------------------------------------------------
+       ERROR
+    ------------------------------------------------- */
+
+    socket.onerror =
+        function(error){
 
             console.error(
-                data.error
+                "WebSocket error:",
+                error
             );
 
-            setStatus(
-                "● DERIV ERROR",
-                false
+
+            setConnectionStatus(
+                "● CONNECTION ERROR",
+                "error"
             );
 
-        }
-
-    };
+        };
 
 
-    ws.onerror = function(error){
+    /* -------------------------------------------------
+       CLOSE
+    ------------------------------------------------- */
 
-        console.log(
-            "WebSocket error",
-            error
-        );
+    socket.onclose =
+        function(){
 
-        setStatus(
-            "● CONNECTION ERROR",
-            false
-        );
-
-    };
-
-
-    ws.onclose = function(){
-
-        setStatus(
-            "● DISCONNECTED — RECONNECTING...",
-            false
-        );
-
-        reconnectTimer =
-            setTimeout(
-                connect,
-                5000
+            console.log(
+                "WebSocket closed"
             );
 
-    };
+
+            setConnectionStatus(
+                "● DISCONNECTED — RECONNECTING...",
+                "error"
+            );
+
+
+            /*
+               Try reconnecting.
+            */
+
+            reconnectTimer =
+                setTimeout(
+                    function(){
+
+                        connect();
+
+                    },
+                    RECONNECT_DELAY
+                );
+
+        };
 
 }
 
 
-/* =========================================
+/* =====================================================
+   SEND
+   ===================================================== */
+
+function send(data){
+
+    if(
+        socket &&
+        socket.readyState ===
+        WebSocket.OPEN
+    ){
+
+        try{
+
+            socket.send(
+                JSON.stringify(data)
+            );
+
+            console.log(
+                "Sent:",
+                data
+            );
+
+        }catch(error){
+
+            console.error(
+                "Send failed:",
+                error
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   ENDPOINT FALLBACK
+   ===================================================== */
+
+function switchEndpoint(){
+
+    endpointIndex++;
+
+    if(
+        endpointIndex >=
+        ENDPOINTS.length
+    ){
+
+        endpointIndex = 0;
+
+    }
+
+
+    console.log(
+        "Trying endpoint:",
+        ENDPOINTS[
+            endpointIndex
+        ]
+    );
+
+
+    if(socket){
+
+        try{
+
+            socket.close();
+
+        }catch(error){}
+
+    }
+
+}
+
+
+/* =====================================================
+   CONNECTION FAILURE
+   ===================================================== */
+
+function handleConnectionFailure(){
+
+    setConnectionStatus(
+        "● RETRYING CONNECTION...",
+        "error"
+    );
+
+
+    endpointIndex++;
+
+    if(
+        endpointIndex >=
+        ENDPOINTS.length
+    ){
+
+        endpointIndex = 0;
+
+    }
+
+
+    reconnectTimer =
+        setTimeout(
+            connect,
+            RECONNECT_DELAY
+        );
+
+}
+
+
+/* =====================================================
    HISTORY
-========================================= */
+   ===================================================== */
 
-function handleHistory(data){
+function processHistory(data){
 
-    if(!data.history)
+    if(
+        !data.history
+    ){
+
+        console.log(
+            "No history returned"
+        );
+
         return;
+
+    }
+
 
     const prices =
         data.history.prices || [];
 
+
     const times =
         data.history.times || [];
 
-    if(data.pip_size){
+
+    /*
+       pip_size may be supplied
+       at top level.
+    */
+
+    if(
+        data.pip_size !==
+        undefined
+    ){
 
         pipSize =
-            Number(data.pip_size);
+            Number(
+                data.pip_size
+            );
 
     }
 
+
     ticks = [];
+
 
     for(
         let i = 0;
@@ -752,105 +1697,210 @@ function handleHistory(data){
         i++
     ){
 
+        const price =
+            Number(
+                prices[i]
+            );
+
+
+        if(
+            !Number.isFinite(price)
+        ){
+
+            continue;
+
+        }
+
+
         ticks.push({
 
             price:
-                Number(prices[i]),
+                price,
 
             time:
-                Number(times[i] || Date.now()/1000)
+                Number(
+                    times[i]
+                    ||
+                    Date.now()/1000
+                )
 
         });
 
     }
 
 
-    if(ticks.length > MAX_TICKS){
+    if(
+        ticks.length >
+        MAX_TICKS
+    ){
 
         ticks =
             ticks.slice(
-                ticks.length - MAX_TICKS
+                -MAX_TICKS
             );
 
     }
 
-    renderAll();
+
+    console.log(
+        "Historical ticks:",
+        ticks.length
+    );
+
+
+    render();
 
 }
 
 
-/* =========================================
+/* =====================================================
    LIVE TICK
-========================================= */
+   ===================================================== */
 
-function handleTick(data){
+function processTick(data){
 
-    if(!data.tick)
+    /*
+       Current Deriv API:
+       tick object contains
+       epoch, quote and symbol.
+    */
+
+    if(
+        !data.tick
+    ){
+
         return;
 
-    const price =
-        Number(data.tick.quote);
+    }
 
-    const time =
+
+    const quote =
         Number(
-            data.tick.epoch ||
+            data.tick.quote
+        );
+
+
+    if(
+        !Number.isFinite(quote)
+    ){
+
+        return;
+
+    }
+
+
+    const epoch =
+        Number(
+            data.tick.epoch
+            ||
             Date.now()/1000
         );
 
 
-    if(data.tick.pip_size){
+    /*
+       pip_size is optional.
+    */
+
+    if(
+        data.tick.pip_size !==
+        undefined
+    ){
 
         pipSize =
-            Number(data.tick.pip_size);
+            Number(
+                data.tick.pip_size
+            );
+
+    }
+
+
+    /*
+       Prevent duplicate ticks
+       when necessary.
+    */
+
+    const last =
+        ticks[
+            ticks.length - 1
+        ];
+
+
+    if(
+        last &&
+        last.time === epoch &&
+        last.price === quote
+    ){
+
+        return;
 
     }
 
 
     ticks.push({
 
-        price: price,
+        price:
+            quote,
 
-        time: time
+        time:
+            epoch
 
     });
 
 
-    if(ticks.length > MAX_TICKS){
+    /*
+       Keep only latest 100.
+    */
+
+    if(
+        ticks.length >
+        MAX_TICKS
+    ){
 
         ticks.shift();
 
     }
 
 
-    renderAll();
+    render();
 
 }
 
 
-/* =========================================
-   DIGIT DATA
-========================================= */
+/* =====================================================
+   DIGITS
+   ===================================================== */
 
 function getDigits(){
 
     return ticks.map(
-        t =>
-            getLastDigit(t.price)
+        function(tick){
+
+            return getLastDigit(
+                tick.price
+            );
+
+        }
     );
 
 }
 
+
+/* =====================================================
+   DIGIT COUNTS
+   ===================================================== */
 
 function getDigitCounts(){
 
     const counts =
         Array(10).fill(0);
 
+
     const digits =
         getDigits();
 
+
     digits.forEach(
-        digit => {
+        function(digit){
 
             if(
                 digit >= 0 &&
@@ -864,16 +1914,17 @@ function getDigitCounts(){
         }
     );
 
+
     return counts;
 
 }
 
 
-/* =========================================
+/* =====================================================
    RISE / FALL
-========================================= */
+   ===================================================== */
 
-function getRiseFall(){
+function movementStats(){
 
     let rise = 0;
 
@@ -888,17 +1939,25 @@ function getRiseFall(){
         i++
     ){
 
+        const previous =
+            ticks[i-1].price;
+
+
+        const current =
+            ticks[i].price;
+
+
         if(
-            ticks[i].price >
-            ticks[i-1].price
+            current >
+            previous
         ){
 
             rise++;
 
         }
         else if(
-            ticks[i].price <
-            ticks[i-1].price
+            current <
+            previous
         ){
 
             fall++;
@@ -913,179 +1972,55 @@ function getRiseFall(){
     }
 
 
-    const total =
-        rise + fall + equal;
-
     return {
 
-        rise,
-        fall,
-        equal,
-        total
+        rise:
+            rise,
+
+        fall:
+            fall,
+
+        equal:
+            equal,
+
+        total:
+            rise +
+            fall +
+            equal
 
     };
 
 }
 
 
-/* =========================================
-   MOMENTUM
-========================================= */
+/* =====================================================
+   CONTRACT STATISTICS
+   ===================================================== */
 
-function calculateMomentum(){
-
-    if(ticks.length < 10)
-        return "Neutral";
-
-
-    const recent =
-        ticks.slice(-10);
-
-
-    let movement = 0;
-
-
-    for(
-        let i = 1;
-        i < recent.length;
-        i++
-    ){
-
-        if(
-            recent[i].price >
-            recent[i-1].price
-        ){
-
-            movement++;
-
-        }
-
-        if(
-            recent[i].price <
-            recent[i-1].price
-        ){
-
-            movement--;
-
-        }
-
-    }
-
-
-    if(movement >= 4)
-        return "Bullish";
-
-    if(movement <= -4)
-        return "Bearish";
-
-    return "Neutral";
-
-}
-
-
-/* =========================================
-   PATTERN DETECTION
-========================================= */
-
-function calculatePattern(){
+function contractStats(){
 
     const digits =
         getDigits();
 
-    if(digits.length < 10)
-        return "Waiting";
-
-
-    const last =
-        digits.slice(-10);
-
-
-    /*
-     * Repeated digit
-     */
-
-    const unique =
-        new Set(last).size;
-
-    if(unique <= 4)
-        return "Concentrated";
-
-
-    /*
-     * Alternating parity
-     */
-
-    let alternating = true;
-
-    for(
-        let i = 1;
-        i < last.length;
-        i++
-    ){
-
-        if(
-            last[i] % 2 ===
-            last[i-1] % 2
-        ){
-
-            alternating = false;
-
-            break;
-
-        }
-
-    }
-
-    if(alternating)
-        return "Alternating";
-
-
-    /*
-     * Repeated final digit
-     */
-
-    if(
-        last[last.length-1] ===
-        last[last.length-2] &&
-        last[last.length-2] ===
-        last[last.length-3]
-    ){
-
-        return "Repeated Digit";
-
-    }
-
-
-    return "Mixed";
-
-}
-
-
-/* =========================================
-   CONTRACT SCORES
-========================================= */
-
-function calculateScores(){
-
-    const digits =
-        getDigits();
 
     const total =
         digits.length;
 
 
-    if(total === 0){
+    if(
+        total === 0
+    ){
 
         return {
 
-            matches: 0,
-            differs: 0,
-            even: 0,
-            odd: 0,
-            over: 0,
-            under: 0,
-            rise: 0,
-            fall: 0
+            matches:0,
+            differs:0,
+            even:0,
+            odd:0,
+            over:0,
+            under:0,
+            rise:0,
+            fall:0
 
         };
 
@@ -1095,7 +2030,7 @@ function calculateScores(){
     const target =
         Number(
             document.getElementById(
-                "targetDigit"
+                "target"
             ).value
         );
 
@@ -1112,90 +2047,297 @@ function calculateScores(){
 
 
     digits.forEach(
-        digit => {
+        function(digit){
 
-            if(digit === target)
+            if(
+                digit === target
+            ){
+
                 matches++;
 
-            if(digit % 2 === 0)
+            }
+
+
+            if(
+                digit % 2 === 0
+            ){
+
                 even++;
 
-            else
+            }
+            else{
+
                 odd++;
 
-            if(digit > target)
+            }
+
+
+            if(
+                digit > target
+            ){
+
                 over++;
 
-            if(digit < target)
+            }
+
+
+            if(
+                digit < target
+            ){
+
                 under++;
+
+            }
 
         }
     );
 
 
-    const rf =
-        getRiseFall();
+    const movement =
+        movementStats();
 
 
     const movementTotal =
-        rf.total || 1;
+        movement.total ||
+        1;
 
 
     return {
 
         matches:
-            matches / total * 100,
+            matches /
+            total *
+            100,
 
         differs:
-            (total - matches) /
-            total * 100,
+            (
+                total -
+                matches
+            ) /
+            total *
+            100,
 
         even:
-            even / total * 100,
+            even /
+            total *
+            100,
 
         odd:
-            odd / total * 100,
+            odd /
+            total *
+            100,
 
         over:
-            over / total * 100,
+            over /
+            total *
+            100,
 
         under:
-            under / total * 100,
+            under /
+            total *
+            100,
 
         rise:
-            rf.rise /
-            movementTotal * 100,
+            movement.rise /
+            movementTotal *
+            100,
 
         fall:
-            rf.fall /
-            movementTotal * 100
+            movement.fall /
+            movementTotal *
+            100
 
     };
 
 }
 
 
-/* =========================================
+/* =====================================================
+   MOMENTUM
+   ===================================================== */
+
+function getMomentum(){
+
+    if(
+        ticks.length <
+        10
+    ){
+
+        return "Waiting";
+
+    }
+
+
+    const recent =
+        ticks.slice(-10);
+
+
+    let score = 0;
+
+
+    for(
+        let i = 1;
+        i < recent.length;
+        i++
+    ){
+
+        if(
+            recent[i].price >
+            recent[i-1].price
+        ){
+
+            score++;
+
+        }
+        else if(
+            recent[i].price <
+            recent[i-1].price
+        ){
+
+            score--;
+
+        }
+
+    }
+
+
+    if(
+        score >= 4
+    ){
+
+        return "Bullish";
+
+    }
+
+
+    if(
+        score <= -4
+    ){
+
+        return "Bearish";
+
+    }
+
+
+    return "Neutral";
+
+}
+
+
+/* =====================================================
+   PATTERN
+   ===================================================== */
+
+function getPattern(){
+
+    const digits =
+        getDigits();
+
+
+    if(
+        digits.length <
+        10
+    ){
+
+        return "Waiting";
+
+    }
+
+
+    const recent =
+        digits.slice(-10);
+
+
+    /*
+       Repeated last digit
+    */
+
+    const n =
+        recent.length;
+
+
+    if(
+        recent[n-1] ===
+        recent[n-2] &&
+        recent[n-2] ===
+        recent[n-3]
+    ){
+
+        return "Repeated Digit";
+
+    }
+
+
+    /*
+       Concentration
+    */
+
+    const unique =
+        new Set(
+            recent
+        ).size;
+
+
+    if(
+        unique <= 4
+    ){
+
+        return "Concentrated";
+
+    }
+
+
+    /*
+       Alternating parity
+    */
+
+    let alternating =
+        true;
+
+
+    for(
+        let i = 1;
+        i < recent.length;
+        i++
+    ){
+
+        if(
+            recent[i] % 2 ===
+            recent[i-1] % 2
+        ){
+
+            alternating =
+                false;
+
+            break;
+
+        }
+
+    }
+
+
+    if(
+        alternating
+    ){
+
+        return "Alternating";
+
+    }
+
+
+    return "Mixed";
+
+}
+
+
+/* =====================================================
    SIGNAL
-========================================= */
+   ===================================================== */
 
 function runAnalysis(){
 
-    if(ticks.length === 0){
-
-        document.getElementById(
-            "signalName"
-        ).textContent =
-            "WAIT";
-
-        document.getElementById(
-            "signalScore"
-        ).textContent =
-            "0.0%";
-
-        return;
-
-    }
+    const scores =
+        contractStats();
 
 
     const contract =
@@ -1204,45 +2346,56 @@ function runAnalysis(){
         ).value;
 
 
-    const scores =
-        calculateScores();
-
-
-    let score =
-        scores[contract] || 0;
+    const score =
+        scores[contract] ||
+        0;
 
 
     let signal =
-        contract.toUpperCase();
+        "WAIT";
 
 
-    /*
-     * Signal classification
-     */
-
-    if(score < 10){
+    if(
+        ticks.length <
+        20
+    ){
 
         signal =
-            "WEAK " + signal;
+            "WAIT";
 
     }
-    else if(score < 30){
+    else if(
+        score >= 60
+    ){
 
         signal =
-            "OBSERVED " + signal;
+            "STRONG OBSERVED " +
+            contract.toUpperCase();
 
     }
-    else if(score < 50){
+    else if(
+        score >= 50
+    ){
 
         signal =
-            "ACTIVE " + signal;
+            "OBSERVED " +
+            contract.toUpperCase();
+
+    }
+    else if(
+        score >= 30
+    ){
+
+        signal =
+            "ACTIVE " +
+            contract.toUpperCase();
 
     }
     else{
 
         signal =
-            "STRONG OBSERVED " +
-            signal;
+            "WEAK " +
+            contract.toUpperCase();
 
     }
 
@@ -1256,21 +2409,34 @@ function runAnalysis(){
     document.getElementById(
         "signalScore"
     ).textContent =
-        score.toFixed(1) + "%";
+        score.toFixed(1) +
+        "%";
 
 }
 
 
-/* =========================================
+/* =====================================================
    DIGIT DISPLAY
-========================================= */
+   ===================================================== */
 
-function renderDigitStats(){
+function renderDigits(){
 
     const container =
         document.getElementById(
-            "digitStats"
+            "digitGrid"
         );
+
+
+    if(
+        ticks.length === 0
+    ){
+
+        container.innerHTML =
+            "Waiting for live data...";
+
+        return;
+
+    }
 
 
     const counts =
@@ -1279,16 +2445,6 @@ function renderDigitStats(){
 
     const total =
         ticks.length;
-
-
-    if(total === 0){
-
-        container.innerHTML =
-            "Waiting for tick data...";
-
-        return;
-
-    }
 
 
     let html = "";
@@ -1308,27 +2464,14 @@ function renderDigitStats(){
 
         html += `
 
-            <div class="bar-row">
+            <div class="digit-box">
 
-                <div class="bar-label">
-
-                    <span>
-                        Digit ${i}
-                    </span>
-
-                    <span>
-                        ${percentage.toFixed(1)}%
-                    </span>
-
+                <div class="digit-number">
+                    ${i}
                 </div>
 
-                <div class="bar">
-
-                    <div
-                        class="bar-fill"
-                        style="width:${percentage}%">
-                    </div>
-
+                <div class="digit-percent">
+                    ${percentage.toFixed(1)}%
                 </div>
 
             </div>
@@ -1344,39 +2487,59 @@ function renderDigitStats(){
 }
 
 
-/* =========================================
+/* =====================================================
    CONTRACT DISPLAY
-========================================= */
+   ===================================================== */
 
-function renderContractStats(){
+function renderContracts(){
 
     const container =
         document.getElementById(
-            "contractStats"
+            "contractAnalysis"
         );
 
 
+    if(
+        ticks.length === 0
+    ){
+
+        container.innerHTML =
+            "Waiting for live data...";
+
+        return;
+
+    }
+
+
     const scores =
-        calculateScores();
+        contractStats();
 
 
     const names = {
 
-        matches: "Matches",
+        matches:
+            "Matches",
 
-        differs: "Differs",
+        differs:
+            "Differs",
 
-        even: "Even",
+        even:
+            "Even",
 
-        odd: "Odd",
+        odd:
+            "Odd",
 
-        over: "Over",
+        over:
+            "Over",
 
-        under: "Under",
+        under:
+            "Under",
 
-        rise: "Rise",
+        rise:
+            "Rise",
 
-        fall: "Fall"
+        fall:
+            "Fall"
 
     };
 
@@ -1386,17 +2549,18 @@ function renderContractStats(){
 
     Object.keys(names)
         .forEach(
-            key => {
+            function(key){
 
                 const value =
-                    scores[key] || 0;
+                    scores[key] ||
+                    0;
 
 
                 html += `
 
-                    <div class="bar-row">
+                    <div class="analysis-row">
 
-                        <div class="bar-label">
+                        <div class="analysis-head">
 
                             <span>
                                 ${names[key]}
@@ -1412,8 +2576,11 @@ function renderContractStats(){
 
                             <div
                                 class="bar-fill"
-                                style="width:${value}%">
-                            </div>
+                                style="width:${Math.min(
+                                    value,
+                                    100
+                                )}%"
+                            ></div>
 
                         </div>
 
@@ -1431,11 +2598,11 @@ function renderContractStats(){
 }
 
 
-/* =========================================
+/* =====================================================
    TICK LIST
-========================================= */
+   ===================================================== */
 
-function renderTickList(){
+function renderTicks(){
 
     const container =
         document.getElementById(
@@ -1443,27 +2610,46 @@ function renderTickList(){
         );
 
 
-    if(ticks.length === 0){
+    if(
+        ticks.length === 0
+    ){
 
-        container.innerHTML =
-            "Waiting for live ticks...";
+        container.innerHTML = `
+
+            <div class="tick-row">
+
+                <span>-</span>
+
+                <span class="tick-price">
+                    Waiting...
+                </span>
+
+                <span>-</span>
+
+            </div>
+
+        `;
 
         return;
 
     }
 
 
+    const recent =
+        ticks
+            .slice()
+            .reverse()
+            .slice(
+                0,
+                MAX_DISPLAY_TICKS
+            );
+
+
     let html = "";
 
 
-    const recent =
-        ticks.slice()
-             .reverse()
-             .slice(0, 30);
-
-
     recent.forEach(
-        tick => {
+        function(tick){
 
             const digit =
                 getLastDigit(
@@ -1478,19 +2664,32 @@ function renderTickList(){
                 .toLocaleTimeString();
 
 
+            const decimals =
+                decimalPlaces();
+
+
+            const price =
+                Number(
+                    tick.price
+                )
+                .toFixed(
+                    decimals
+                );
+
+
             html += `
 
-                <div class="tick">
+                <div class="tick-row">
 
                     <span>
                         ${time}
                     </span>
 
-                    <span>
-                        ${tick.price}
+                    <span class="tick-price">
+                        ${price}
                     </span>
 
-                    <span class="digit">
+                    <span class="tick-digit">
                         ${digit}
                     </span>
 
@@ -1508,14 +2707,26 @@ function renderTickList(){
 }
 
 
-/* =========================================
-   MAIN DISPLAY
-========================================= */
+/* =====================================================
+   MAIN RENDER
+   ===================================================== */
 
-function renderAll(){
+function render(){
 
-    updateMarketName();
+    /*
+       Market
+    */
 
+    document.getElementById(
+        "marketName"
+    ).textContent =
+        marketNames[currentSymbol]
+        || currentSymbol;
+
+
+    /*
+       Tick count
+    */
 
     document.getElementById(
         "tickCount"
@@ -1523,10 +2734,18 @@ function renderAll(){
         ticks.length;
 
 
-    if(ticks.length > 0){
+    /*
+       Latest tick
+    */
+
+    if(
+        ticks.length > 0
+    ){
 
         const latest =
-            ticks[ticks.length - 1];
+            ticks[
+                ticks.length - 1
+            ];
 
 
         const digit =
@@ -1535,10 +2754,18 @@ function renderAll(){
             );
 
 
+        const decimals =
+            decimalPlaces();
+
+
         document.getElementById(
-            "quote"
+            "currentQuote"
         ).textContent =
-            latest.price;
+            Number(
+                latest.price
+            ).toFixed(
+                decimals
+            );
 
 
         document.getElementById(
@@ -1550,31 +2777,35 @@ function renderAll(){
         document.getElementById(
             "momentum"
         ).textContent =
-            calculateMomentum();
+            getMomentum();
 
 
         document.getElementById(
             "pattern"
         ).textContent =
-            calculatePattern();
+            getPattern();
 
     }
 
 
-    renderDigitStats();
+    /*
+       Analysis
+    */
 
-    renderContractStats();
+    renderDigits();
 
-    renderTickList();
+    renderContracts();
+
+    renderTicks();
 
     runAnalysis();
 
 }
 
 
-/* =========================================
+/* =====================================================
    MARKET CHANGE
-========================================= */
+   ===================================================== */
 
 document.getElementById(
     "market"
@@ -1582,8 +2813,7 @@ document.getElementById(
     "change",
     function(){
 
-        currentSymbol =
-            this.value;
+        endpointIndex = 0;
 
         connect();
 
@@ -1591,39 +2821,65 @@ document.getElementById(
 );
 
 
-/* =========================================
+/* =====================================================
    CONTRACT CHANGE
-========================================= */
+   ===================================================== */
 
 document.getElementById(
     "contract"
 ).addEventListener(
     "change",
-    runAnalysis
+    function(){
+
+        runAnalysis();
+
+    }
 );
 
 
-/* =========================================
+/* =====================================================
    TARGET CHANGE
-========================================= */
+   ===================================================== */
 
 document.getElementById(
-    "targetDigit"
+    "target"
 ).addEventListener(
     "change",
-    runAnalysis
+    function(){
+
+        render();
+
+    }
 );
 
 
-/* =========================================
-   START
-========================================= */
+/* =====================================================
+   BUTTON
+   ===================================================== */
 
-updateMarketName();
+document.getElementById(
+    "analyzeButton"
+).addEventListener(
+    "click",
+    function(){
+
+        runAnalysis();
+
+    }
+);
+
+
+/* =====================================================
+   START ANALYZER
+   ===================================================== */
+
+render();
 
 connect();
+
 
 </script>
 
 </body>
-  </html>
+
+                </html>
