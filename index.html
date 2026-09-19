@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blueprint Analyzer</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #080b12;
+      color: #ffffff;
+      padding: 15px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    header {
+      background: #101620;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 15px;
+      border: 1px solid #202938;
+    }
+
+    header h1 {
+      font-size: 25px;
+    }
+
+    header p {
+      color: #8d99aa;
+      margin-top: 6px;
+      font-size: 14px;
+    }
+
+    .status {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 7px 12px;
+      border-radius: 20px;
+      background: #17261e;
+      color: #4cff91;
+      font-size: 12px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    select,
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #293343;
+      background: #111722;
+      color: white;
+      font-size: 14px;
+    }
+
+    button {
+      background: #2563eb;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .card {
+      background: #101620;
+      border: 1px solid #202938;
+      border-radius: 15px;
+      padding: 18px;
+    }
+
+    .card h2 {
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .big-signal {
+      text-align: center;
+      padding: 25px 10px;
+    }
+
+    .signal {
+      font-size: 27px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .confidence {
+      font-size: 40px;
+      font-weight: bold;
+    }
+
+    .green {
+      color: #4cff91;
+    }
+
+    .yellow {
+      color: #ffd166;
+    }
+
+    .red {
+      color: #ff5c6c;
+    }
+
+    .digits {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+    }
+
+    .digit {
+      background: #151c28;
+      border-radius: 9px;
+      padding: 10px 4px;
+      text-align: center;
+    }
+
+    .digit-number {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .digit-count {
+      color: #9aa6b5;
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .bar {
+      height: 6px;
+      background: #252e3c;
+      border-radius: 10px;
+      margin-top: 7px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: #3b82f6;
+      border-radius: 10px;
+    }
+
+    .analysis-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 11px 0;
+      border-bottom: 1px solid #202938;
+      font-size: 14px;
+    }
+
+    .analysis-row:last-child {
+      border-bottom: none;
+    }
+
+    .value {
+      font-weight: bold;
+    }
+
+    .history {
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .history-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 9px;
+      margin-bottom: 6px;
+      background: #151c28;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #687588;
+      font-size: 11px;
+      padding: 20px 5px;
+    }
+
+    @media (max-width: 500px) {
+      body {
+        padding: 9px;
+      }
+
+      header h1 {
+        font-size: 21px;
+      }
+
+      .confidence {
+        font-size: 34px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <header>
+    <h1>⚡ Blueprint Analyzer</h1>
+    <p>Deriv Synthetic Market Analysis Dashboard</p>
+    <span class="status">● ANALYZER ONLINE</span>
+  </header>
+
+  <div class="controls">
+
+    <select id="market">
+      <option>Volatility 10 Index</option>
+      <option>Volatility 25 Index</option>
+      <option>Volatility 50 Index</option>
+      <option>Volatility 75 Index</option>
+      <option>Volatility 100 Index</option>
+      <option>Volatility 10 (1s)</option>
+      <option>Volatility 25 (1s)</option>
+      <option>Volatility 50 (1s)</option>
+      <option>Volatility 75 (1s)</option>
+      <option>Volatility 100 (1s)</option>
+    </select>
+
+    <select id="contract">
+      <option>Matches</option>
+      <option>Differs</option>
+      <option>Even</option>
+      <option>Odd</option>
+      <option>Over</option>
+      <option>Under</option>
+      <option>Rise</option>
+      <option>Fall</option>
+    </select>
+
+    <select id="targetDigit">
+      <option value="0">Digit 0</option>
+      <option value="1">Digit 1</option>
+      <option value="2">Digit 2</option>
+      <option value="3">Digit 3</option>
+      <option value="4">Digit 4</option>
+      <option value="5">Digit 5</option>
+      <option value="6">Digit 6</option>
+      <option value="7">Digit 7</option>
+      <option value="8">Digit 8</option>
+      <option value="9">Digit 9</option>
+    </select>
+
+    <button onclick="runAnalysis()">RUN ANALYSIS</button>
+
+  </div>
+
+  <div class="grid">
+
+    <div class="card big-signal">
+      <h2>🧠 CURRENT SIGNAL</h2>
+
+      <div id="signal" class="signal yellow">
+        WAIT
+      </div>
+
+      <div id="confidence" class="confidence">
+        --%
+      </div>
+
+      <p style="color:#8d99aa;">Calculated confidence</p>
+    </div>
+
+    <div class="card">
+
+      <h2>📊 Market Information</h2>
+
+      <div class="analysis-row">
+        <span>Market</span>
+        <span id="marketDisplay" class="value">Volatility 10 Index</span>
+      </div>
+
+      <div class="analysis-row">
+        <span>Last Digit</span>
+        <span id="lastDigit" class="value">-</span>
+      </div>
+
+      <div class="analysis-row">
+        <span>Ticks Analysed</span>
+        <span id="tickCount" class="value">100</span>
+      </div>
+
+      <div class="analysis-row">
+        <span>Momentum</span>
+        <span id="momentum" class="value yellow">NEUTRAL</span>
+      </div>
+
+      <div class="analysis-row">
+        <span>Pattern</span>
+        <span id="pattern" class="value">SCANNING</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+
+      <h2>🔢 Digit Frequency</h2>
+
+      <div id="digits" class="digits"></div>
+
+    </div>
+
+    <div class="card">
+
+      <h2>🎯 Contract Analysis</h2>
+
+      <div class="analysis-row">
+        <span>Matches</span>
+        <span id="matches" class="value">--%</span>
+      </div>
+
+      <div class="analysis-row">
+        <span>Differs</span>
+        <span id="differs" class="value">--%</span>
+      </div>
+
+      <div class="analysis-row">
+        <span>Even</span>
+        <span id="even" class="value">--%</span>
+      </div>
+
+      <div class="analysis-row">
+        <span>Odd</span>
+        <span id="odd" class="value">--%</span>
+      </div>
+
+      <div class="analysis-row">
+        <span>Over 5</span>
+        <span id="over" class="value">--%</span>
+      </div>
+
+      <div class="analysis-row">
+        <span>Under 5</span>
+        <span id="under" class="value">--%</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+
+      <h2>🔥 Pattern Analysis</h2>
+
+      <div class="analysis-row">
+        <span>Last 5 Digits</span>
+        <span id="lastFive" class="value">-----</span>
+      </div>
+
+      <div class="analysis-row">
+        <span>Highest Digit</span>
+        <span id="highestDigit" class="value">-</span>
+      </div>
+
+      <div class="analysis-row">
+        <span>Lowest Digit</span>
+        <span id="lowestDigit" class="value">-</span>
+      </div>
+
+      <div class="analysis-row">
+        <span>Most Frequent</span>
+        <span id="mostFrequent" class="value">-</span>
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <h2>📋 Signal History</h2>
+
+      <div id="history" class="history">
+        <div class="history-row">
+          <span>Analyzer started</span>
+          <span>READY</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Blueprint Analyzer • Analysis tool only • No guaranteed prediction
+  </div>
+
+</div>
+
+
+<script>
+
+let ticks = [];
+
+
+// Generate sample tick data for the first version
+function generateTicks() {
+
+  ticks = [];
+
+  for (let i = 0; i < 100; i++) {
+
+    let digit = Math.floor(Math.random() * 10);
+
+    ticks.push(digit);
+
+  }
+
+}
+
+
+// Calculate digit statistics
+function calculateStats() {
+
+  let counts = Array(10).fill(0);
+
+  ticks.forEach(digit => {
+    counts[digit]++;
+  });
+
+  return counts;
+
+}
+
+
+// Display digit statistics
+function displayDigits(counts) {
+
+  const container = document.getElementById("digits");
+
+  container.innerHTML = "";
+
+  counts.forEach((count, digit) => {
+
+    let percentage = (count / ticks.length) * 100;
+
+    let div = document.createElement("div");
+
+    div.className = "digit";
+
+    div.innerHTML = `
+      <div class="digit-number">${digit}</div>
+
+      <div class="digit-count">
+        ${count} (${percentage.toFixed(1)}%)
+      </div>
+
+      <div class="bar">
+        <div class="bar-fill"
+             style="width:${percentage}%">
+        </div>
+      </div>
+    `;
+
+    container.appendChild(div);
+
+  });
+
+}
+
+
+// Main analysis
+function runAnalysis() {
+
+  generateTicks();
+
+  let counts = calculateStats();
+
+  displayDigits(counts);
+
+  let market =
+    document.getElementById("market").value;
+
+  let contract =
+    document.getElementById("contract").value;
+
+  let target =
+    Number(document.getElementById("targetDigit").value);
+
+
+  // Basic statistics
+
+  let targetCount = counts[target];
+
+  let matchProbability =
+    (targetCount / ticks.length) * 100;
+
+  let differProbability =
+    100 - matchProbability;
+
+
+  let evenCount =
+    ticks.filter(d => d % 2 === 0).length;
+
+  let oddCount =
+    ticks.length - evenCount;
+
+
+  let overCount =
+    ticks.filter(d => d > 5).length;
+
+  let underCount =
+    ticks.filter(d => d < 5).length;
+
+
+  // Update statistics
+
+  document.getElementById("matches").innerText =
+    matchProbability.toFixed(1) + "%";
+
+  document.getElementById("differs").innerText =
+    differProbability.toFixed(1) + "%";
+
+  document.getElementById("even").innerText =
+    ((evenCount / ticks.length) * 100).toFixed(1) + "%";
+
+  document.getElementById("odd").innerText =
+    ((oddCount / ticks.length) * 100).toFixed(1) + "%";
+
+  document.getElementById("over").innerText =
+    ((overCount / ticks.length) * 100).toFixed(1) + "%";
+
+  document.getElementById("under").innerText =
+    ((underCount / ticks.length) * 100).toFixed(1) + "%";
+
+
+  // Last digit
+
+  let lastDigit =
+    ticks[ticks.length - 1];
+
+  document.getElementById("lastDigit").innerText =
+    lastDigit;
+
+
+  // Last five digits
+
+  let lastFive =
+    ticks.slice(-5).join(" ");
+
+  document.getElementById("lastFive").innerText =
+    lastFive;
+
+
+  // Highest / lowest
+
+  document.getElementById("highestDigit").innerText =
+    Math.max(...ticks);
+
+  document.getElementById("lowestDigit").innerText =
+    Math.min(...ticks);
+
+
+  // Most frequent digit
+
+  let maxCount =
+    Math.max(...counts);
+
+  let mostFrequent =
+    counts.indexOf(maxCount);
+
+  document.getElementById("mostFrequent").innerText =
+    mostFrequent;
+
+
+  // Momentum
+
+  let recent =
+    ticks.slice(-20);
+
+  let recentAverage =
+    recent.reduce((a,b) => a+b, 0) /
+    recent.length;
+
+
+  let momentumElement =
+    document.getElementById("momentum");
+
+
+  if (recentAverage > 5.5) {
+
+    momentumElement.innerText =
+      "HIGH DIGITS";
+
+    momentumElement.className =
+      "value green";
+
+  }
+
+  else if (recentAverage < 4.5) {
+
+    momentumElement.innerText =
+      "LOW DIGITS";
+
+    momentumElement.className =
+      "value red";
+
+  }
+
+  else {
+
+    momentumElement.innerText =
+      "NEUTRAL";
+
+    momentumElement.className =
+      "value yellow";
+
+  }
+
+
+  // Simple signal engine
+
+  let signal = "WAIT";
+
+  let confidence = 50;
+
+
+  if (contract === "Matches") {
+
+    if (matchProbability >= 15) {
+
+      signal = "MATCHES " + target;
+
+      confidence =
+        Math.min(95,
+          50 + (matchProbability - 10) * 3);
+
+    }
+
+  }
+
+
+  if (contract === "Differs") {
+
+    if (differProbability >= 85) {
+
+      signal = "DIFFERS " + target;
+
+      confidence =
+        Math.min(95,
+          50 + (differProbability - 80) * 2);
+
+    }
+
+  }
+
+
+  if (contract === "Even") {
+
+    if (evenCount > oddCount) {
+
+      signal = "EVEN";
+
+      confidence =
+        50 + ((evenCount / ticks.length) * 100 - 50);
+
+    }
+
+  }
+
+
+  if (contract === "Odd") {
+
+    if (oddCount > evenCount) {
+
+      signal = "ODD";
+
+      confidence =
+        50 + ((oddCount / ticks.length) * 100 - 50);
+
+    }
+
+  }
+
+
+  if (contract === "Over") {
+
+    if (overCount > underCount) {
+
+      signal = "OVER 5";
+
+      confidence =
+        50 + ((overCount / ticks.length) * 100 - 50);
+
+    }
+
+  }
+
+
+  if (contract === "Under") {
+
+    if (underCount > overCount) {
+
+      signal = "UNDER 5";
+
+      confidence =
+        50 + ((underCount / ticks.length) * 100 - 50);
+
+    }
+
+  }
+
+
+  // Rise/Fall uses recent digit direction
+
+  if (contract === "Rise" ||
+      contract === "Fall") {
+
+    let rising = 0;
+    let falling = 0;
+
+    for (let i = 1; i < recent.length; i++) {
+
+      if (recent[i] > recent[i-1])
+        rising++;
+
+      if (recent[i] < recent[i-1])
+        falling++;
+
+    }
+
+    if (contract === "Rise" &&
+        rising > falling) {
+
+      signal = "RISE";
+
+      confidence =
+        50 + ((rising / (rising + falling)) * 50);
+
+    }
+
+    if (contract === "Fall" &&
+        falling > rising) {
+
+      signal = "FALL";
+
+      confidence =
+        50 + ((falling / (rising + falling)) * 50);
+
+    }
+
+  }
+
+
+  confidence =
+    Math.max(50, Math.min(95, confidence));
+
+
+  // Display signal
+
+  let signalElement =
+    document.getElementById("signal");
+
+  signalElement.innerText =
+    signal;
+
+  document.getElementById("confidence").innerText =
+    confidence.toFixed(1) + "%";
+
+
+  if (signal === "WAIT") {
+
+    signalElement.className =
+      "signal yellow";
+
+  }
+
+  else {
+
+    signalElement.className =
+      "signal green";
+
+  }
+
+
+  document.getElementById("marketDisplay").innerText =
+    market;
+
+
+  document.getElementById("pattern").innerText =
+    signal === "WAIT" ?
+    "WEAK / UNCLEAR" :
+    "PATTERN DETECTED";
+
+
+  addHistory(signal, confidence);
+
+}
+
+
+// Signal history
+
+function addHistory(signal, confidence) {
+
+  const history =
+    document.getElementById("history");
+
+  const row =
+    document.createElement("div");
+
+  row.className =
+    "history-row";
+
+  row.innerHTML = `
+    <span>${signal}</span>
+    <span>${confidence.toFixed(1)}%</span>
+  `;
+
+  history.prepend(row);
+
+}
+
+
+// Start analyzer
+
+runAnalysis();
+
+</script>
+
+</body>
+  </html>
